@@ -23,16 +23,16 @@ public class Checking extends Account {
 	 * @param float is the deposit amount
 	 */
 	public boolean deposit(float amount) {
-		if (getState() != State.CLOSED && amount > 0.0f) {
+		if (getState() != State.CLOSED && amount > _ZERO_ACCOUNT_BALANCE) {
 			balance = balance + amount;
-			if (balance >= 0.0f) {
+			if (balance >= _ZERO_ACCOUNT_BALANCE) {
 				setState(State.OPEN);
 			}
 			return true;
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Withdrawal. After 10 withdrawals a fee of $2 is charged per transaction You may 
 	 * continue to withdraw an overdrawn account until the balance is below -$100
@@ -41,12 +41,12 @@ public class Checking extends Account {
 		if (amount > 0.0f) {	
 			float originalBalance=balance;
 			// KG: incorrect, last balance check should be >=
-			if (getState() == State.OPEN || (getState() == State.OVERDRAWN && balance > -100.0f)) {
+			if (getState() == State.OPEN || (getState() == State.OVERDRAWN && balance > _MAX_NEGATIVE_BALANCE)) {
 				balance = balance - amount;
 				numWithdraws++;
-				if (numWithdraws > 10)
-					balance = balance - 2.0f;
-				if (balance < 0.0f) {
+				if (numWithdraws > _MAX_FREE_WITHDRAWLS)
+					balance = balance - _WITHDRAWL_FEE;
+				if (balance < _ZERO_ACCOUNT_BALANCE) {
 					setState(State.OVERDRAWN);
 				}
 				if(balance<_MINIMUM_ACCOUNT_VALUE){
@@ -66,4 +66,9 @@ public class Checking extends Account {
 	public String toString() {
 		return "Checking: " + getName() + ": " + getBalance();
 	}
+	
+	private final float _WITHDRAWL_FEE=2.0f;
+	private final int _MAX_FREE_WITHDRAWLS = 10;
+	private final float _ZERO_ACCOUNT_BALANCE=0.0f;
+	private final float _MAX_NEGATIVE_BALANCE=-100.0f;
 }
