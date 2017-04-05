@@ -3,7 +3,7 @@ package banking.primitive.core;
 public class Savings extends Account {
 	private static final long serialVersionUID = 111L;
 	private int numWithdraws = 0;
-
+	private final float _MINIMUM_ACCOUNT_VALUE=-100.0f;
 	public Savings(String name) {
 		super(name);
 	}
@@ -30,6 +30,7 @@ public class Savings extends Account {
 	 * An account whose balance dips below 0 is in an OVERDRAWN state
 	 */
 	public boolean withdraw(float amount) {
+		float originalBalance=balance;
 		if (getState() == State.OPEN && amount > 0.0f) {
 			balance = balance - amount;
 			numWithdraws++;
@@ -38,6 +39,10 @@ public class Savings extends Account {
 			// KG BVA: should be < 0
 			if (balance <= 0.0f) {
 				setState(State.OVERDRAWN);
+			}
+			if(balance<_MINIMUM_ACCOUNT_VALUE){
+				balance=originalBalance;
+				return false;
 			}
 			return true;
 		}
