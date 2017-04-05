@@ -3,6 +3,7 @@ package banking.primitive.core;
 public class Checking extends Account {
 
 	private static final long serialVersionUID = 11L;
+	private final float _MINIMUM_ACCOUNT_VALUE=-100.0f;
 	private int numWithdraws = 0;
 	
 	private Checking(String name) {
@@ -37,7 +38,8 @@ public class Checking extends Account {
 	 * continue to withdraw an overdrawn account until the balance is below -$100
 	 */
 	public boolean withdraw(float amount) {
-		if (amount > 0.0f) {		
+		if (amount > 0.0f) {	
+			float originalBalance=balance;
 			// KG: incorrect, last balance check should be >=
 			if (getState() == State.OPEN || (getState() == State.OVERDRAWN && balance > -100.0f)) {
 				balance = balance - amount;
@@ -46,6 +48,10 @@ public class Checking extends Account {
 					balance = balance - 2.0f;
 				if (balance < 0.0f) {
 					setState(State.OVERDRAWN);
+				}
+				if(balance<_MINIMUM_ACCOUNT_VALUE){
+					balance=originalBalance;
+					return false;
 				}
 				return true;
 			}
